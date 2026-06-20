@@ -1,96 +1,3 @@
-import { mkdir, writeFile } from "node:fs/promises";
-
-const TODAY = new Intl.DateTimeFormat("en-GB", {
-  dateStyle: "full",
-  timeZone: "Asia/Singapore",
-}).format(new Date());
-
-const TOPICS = [
-  {
-    id: "stripe",
-    title: "Stripe & Rivals",
-    color: "#635bff",
-    queries: [
-      "Stripe payments news",
-      "Adyen PayPal Block agentic commerce payments",
-    ],
-    implication:
-      "For a Stripe PM covering Greater China, the competitive signal is worth tracking for product packaging, enterprise sales, and partner strategy.",
-  },
-  {
-    id: "fintech",
-    title: "Fintech",
-    color: "#0f766e",
-    queries: ["fintech payments stablecoin RWA tokenization fraud"],
-    implication:
-      "The development may shape customer demand, compliance expectations, or platform risk controls across cross-border payment flows.",
-  },
-  {
-    id: "china",
-    title: "Greater China",
-    color: "#b42318",
-    queries: [
-      "Greater China payments Alipay WeChat Pay digital yuan cross-border regulation",
-      "China economy news Hong Kong Taiwan",
-    ],
-    implication:
-      "The China, Hong Kong, or Taiwan angle matters for market access, localization choices, and merchant operating confidence.",
-  },
-  {
-    id: "tech",
-    title: "AI & Commerce Tech",
-    color: "#7c3aed",
-    queries: ["AI agentic commerce technology news payments"],
-    implication:
-      "The commerce angle is relevant because agentic buying, identity, and checkout automation could change how merchants integrate payments.",
-  },
-  {
-    id: "world",
-    title: "World",
-    color: "#334155",
-    queries: ["world top news headlines business economy"],
-    implication:
-      "The broader macro signal may affect consumer demand, merchant sentiment, FX exposure, or operating risk.",
-  },
-];
-
-function escapeHtml(value = "") {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function decodeEntities(value = "") {
-  return value
-    .replaceAll("&amp;", "&")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">")
-    .replaceAll("&quot;", '"')
-    .replaceAll("&#39;", "'")
-    .replaceAll("&#039;", "'")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)));
-}
-
-function stripTags(value = "") {
-  return decodeEntities(value.replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ").trim();
-}
-
-function hostname(url) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return "News";
-  }
-}
-
-function headline(title) {
-  return stripTags(title)
-    .replace(/\s+-\s+[^-]+$/, "")
-    .split(/\s+/)
-    .slice(0, 14)
     .join(" ");
 }
 
@@ -229,16 +136,6 @@ const html = `<!doctype html>
       margin: 0 0 18px;
       font-size: 0.98rem;
     }
-    button {
-      border: 0;
-      border-radius: 8px;
-      background: #172033;
-      color: white;
-      font: inherit;
-      font-weight: 700;
-      padding: 11px 14px;
-      min-height: 44px;
-    }
     main { padding: 18px; }
     details {
       background: var(--panel);
@@ -310,11 +207,10 @@ const html = `<!doctype html>
     <div class="wrap">
       <h1>Morning Briefing</h1>
       <p class="date">${escapeHtml(TODAY)} · Stripe PM lens for Greater China</p>
-      <button id="play" type="button">Play Briefing</button>
     </div>
   </header>
   <main class="wrap" id="app"></main>
-  <script type="application/json" id="briefing-data">${escapeHtml(JSON.stringify(briefing))}</script>
+  <script type="application/json" id="briefing-data">${safeJsonForScript(briefing)}</script>
   <script>
     const data = JSON.parse(document.getElementById("briefing-data").textContent);
     const app = document.getElementById("app");
@@ -338,23 +234,6 @@ const html = `<!doctype html>
         </div>
       </details>
     \`).join("");
-
-    document.getElementById("play").addEventListener("click", () => {
-      if (!("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const voices = window.speechSynthesis.getVoices();
-      const voice = voices.find(v => v.lang === "en-GB") || voices.find(v => v.lang.startsWith("en"));
-      const text = data.sections.map(section =>
-        section.title + ". " + section.stories.map(story =>
-          story.headline + ". " + story.summary
-        ).join(" ")
-      ).join(" ");
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.88;
-      utterance.pitch = 0.96;
-      if (voice) utterance.voice = voice;
-      window.speechSynthesis.speak(utterance);
-    });
   </script>
 </body>
 </html>`;
