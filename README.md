@@ -1,2 +1,2 @@
 # morning-briefing
-news briefingd
+news briefing
