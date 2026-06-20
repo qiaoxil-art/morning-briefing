@@ -1,0 +1,37 @@
+{
+  "date": "Saturday, 20 June 2026",
+  "generatedAt": "2026-06-20T06:29:15.407Z",
+  "timezone": "Asia/Singapore",
+  "sections": [
+    {
+      "id": "stripe",
+      "title": "Stripe & Rivals",
+      "color": "#635bff",
+      "stories": []
+    },
+    {
+      "id": "fintech",
+      "title": "Fintech",
+      "color": "#0f766e",
+      "stories": []
+    },
+    {
+      "id": "china",
+      "title": "Greater China",
+      "color": "#b42318",
+      "stories": []
+    },
+    {
+      "id": "tech",
+      "title": "AI & Commerce Tech",
+      "color": "#7c3aed",
+      "stories": []
+    },
+    {
+      "id": "world",
+      "title": "World",
+      "color": "#334155",
+      "stories": []
+    }
+  ]
+}

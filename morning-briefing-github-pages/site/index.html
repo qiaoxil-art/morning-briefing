@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Morning Briefing</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fb;
+      --ink: #172033;
+      --muted: #5d6677;
+      --line: #dfe4ec;
+      --panel: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+    header {
+      padding: 28px 18px 18px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+    }
+    .wrap {
+      width: min(920px, 100%);
+      margin: 0 auto;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.85rem, 7vw, 3.4rem);
+      letter-spacing: 0;
+      line-height: 1;
+    }
+    .date {
+      color: var(--muted);
+      margin: 0 0 18px;
+      font-size: 0.98rem;
+    }
+    button {
+      border: 0;
+      border-radius: 8px;
+      background: #172033;
+      color: white;
+      font: inherit;
+      font-weight: 700;
+      padding: 11px 14px;
+      min-height: 44px;
+    }
+    main { padding: 18px; }
+    details {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--accent);
+      border-radius: 8px;
+      margin: 0 auto 14px;
+      overflow: hidden;
+    }
+    summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+    summary::-webkit-details-marker { display: none; }
+    .count {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    .stories {
+      border-top: 1px solid var(--line);
+      padding: 4px 16px 12px;
+    }
+    article {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    article:last-child { border-bottom: 0; }
+    h2 {
+      margin: 0 0 7px;
+      font-size: 1.02rem;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    p {
+      margin: 0 0 8px;
+      color: #2e3748;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    a {
+      color: var(--accent);
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .empty {
+      color: var(--muted);
+      padding: 14px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Morning Briefing</h1>
+      <p class="date">Saturday, 20 June 2026 · Stripe PM lens for Greater China</p>
+      <button id="play" type="button">Play Briefing</button>
+    </div>
+  </header>
+  <main class="wrap" id="app"></main>
+  <script type="application/json" id="briefing-data">{&quot;date&quot;:&quot;Saturday, 20 June 2026&quot;,&quot;generatedAt&quot;:&quot;2026-06-20T06:29:15.407Z&quot;,&quot;timezone&quot;:&quot;Asia/Singapore&quot;,&quot;sections&quot;:[{&quot;id&quot;:&quot;stripe&quot;,&quot;title&quot;:&quot;Stripe &amp; Rivals&quot;,&quot;color&quot;:&quot;#635bff&quot;,&quot;stories&quot;:[]},{&quot;id&quot;:&quot;fintech&quot;,&quot;title&quot;:&quot;Fintech&quot;,&quot;color&quot;:&quot;#0f766e&quot;,&quot;stories&quot;:[]},{&quot;id&quot;:&quot;china&quot;,&quot;title&quot;:&quot;Greater China&quot;,&quot;color&quot;:&quot;#b42318&quot;,&quot;stories&quot;:[]},{&quot;id&quot;:&quot;tech&quot;,&quot;title&quot;:&quot;AI &amp; Commerce Tech&quot;,&quot;color&quot;:&quot;#7c3aed&quot;,&quot;stories&quot;:[]},{&quot;id&quot;:&quot;world&quot;,&quot;title&quot;:&quot;World&quot;,&quot;color&quot;:&quot;#334155&quot;,&quot;stories&quot;:[]}]}</script>
+  <script>
+    const data = JSON.parse(document.getElementById("briefing-data").textContent);
+    const app = document.getElementById("app");
+    app.innerHTML = data.sections.map((section, index) => `
+      <details style="--accent: ${section.color}" ${index === 0 ? "open" : ""}>
+        <summary>
+          <span>${section.title}</span>
+          <span class="count">${section.stories.length} stories</span>
+        </summary>
+        <div class="stories">
+          ${section.stories.length ? section.stories.map(story => `
+            <article>
+              <h2>${story.headline}</h2>
+              <p>${story.summary}</p>
+              <div class="meta">
+                <span>${story.source}</span>
+                <a href="${story.url}" target="_blank" rel="noopener noreferrer">Read -&gt;</a>
+              </div>
+            </article>
+          `).join("") : `<p class="empty">No stories found for this section on this run.</p>`}
+        </div>
+      </details>
+    `).join("");
+
+    document.getElementById("play").addEventListener("click", () => {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.lang === "en-GB") || voices.find(v => v.lang.startsWith("en"));
+      const text = data.sections.map(section =>
+        section.title + ". " + section.stories.map(story =>
+          story.headline + ". " + story.summary
+        ).join(" ")
+      ).join(" ");
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.88;
+      utterance.pitch = 0.96;
+      if (voice) utterance.voice = voice;
+      window.speechSynthesis.speak(utterance);
+    });
+  </script>
+</body>
+</html>
