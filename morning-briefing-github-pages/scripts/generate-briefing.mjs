@@ -57,6 +57,7 @@ function htmlEscape(value = "") {
 
 function decodeEntities(value = "") {
   return value
+    .replaceAll("&nbsp;", " ")
     .replaceAll("&amp;", "&")
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">")
@@ -86,7 +87,10 @@ function makeHeadline(title) {
 }
 
 function makeSummary(item, angle) {
-  const description = stripTags(item.description).split(/(?<=[.!?])\s+/)[0];
+  const source = item.source || sourceFromUrl(item.link);
+  const description = stripTags(item.description)
+    .replace(new RegExp(`\\s+${source.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"), "")
+    .split(/(?<=[.!?])\s+/)[0];
   const firstSentence =
     description && description.length > 45
       ? description
